@@ -1,0 +1,18 @@
+package com.incerti.inSuggester;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class InSuggesterApplicationRunnerTest {
+
+  @Test
+  public void contextLoads() {
+    // This is a sanity check just to test the spring application context
+    // configuration with its dependency injections
+  }
+
+}
