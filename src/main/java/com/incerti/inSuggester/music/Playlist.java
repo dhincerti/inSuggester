@@ -2,10 +2,13 @@ package com.incerti.inSuggester.music;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-public class Playlist {
+public class Playlist implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   @JsonIgnoreProperties
   private Genre genre;
 

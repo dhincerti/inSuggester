@@ -5,6 +5,7 @@ import net.aksingh.owmjapis.core.OWM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class OpenWeatherMapService implements WeatherService {
   private String apiKey;
 
   @Override
+  @Cacheable(cacheNames = "temperature", key = "#city")
   public Double getCurrentTemperatureOf(final String city) {
     LOGGER.info("Retrieving current temperature of '{}' city", city);
 

@@ -9,6 +9,7 @@ import com.wrapper.spotify.model_objects.specification.Recommendations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class SpotifyService implements MusicService {
         .build();
   }
 
+  @Cacheable(cacheNames = "playlist", key = "#genre")
   public Playlist getPlaylistByGenre(final Genre genre) {
     LOGGER.info("Retrieving a {} playlist", genre);
     generateAccessToken();
