@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.support.NoOpCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -29,7 +30,7 @@ public class CacheConfig extends CachingConfigurerSupport {
 
   @Bean
   public LettuceConnectionFactory redisConnectionFactory(
-      final CacheConfigurationProperties properties) {
+      final CacheProperties properties) {
     LOGGER.info("Redis (/Lettuce) configuration enabled. With cache timeout {} seconds.",
         properties.getTimeout());
 
@@ -48,13 +49,13 @@ public class CacheConfig extends CachingConfigurerSupport {
   }
 
   @Bean
-  public RedisCacheConfiguration cacheConfiguration(final CacheConfigurationProperties properties) {
+  public RedisCacheConfiguration cacheConfiguration(final CacheProperties properties) {
     return createCacheConfiguration(properties.getTimeout());
   }
 
   @Bean
   public CacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory,
-      final CacheConfigurationProperties properties) {
+      final CacheProperties properties) {
     final Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
     for (final Entry<String, Long> cacheNameAndTimeout : properties.getExpiration()
@@ -63,9 +64,14 @@ public class CacheConfig extends CachingConfigurerSupport {
           createCacheConfiguration(cacheNameAndTimeout.getValue()));
     }
 
-    return RedisCacheManager
-        .builder(redisConnectionFactory)
-        .cacheDefaults(cacheConfiguration(properties))
-        .withInitialCacheConfigurations(cacheConfigurations).build();
+
+    if (properties.isEnabled()) {
+      return RedisCacheManager
+          .builder(redisConnectionFactory)
+          .cacheDefaults(cacheConfiguration(properties))
+          .withInitialCacheConfigurations(cacheConfigurations).build();
+    }
+
+    return new NoOpCacheManager();
   }
 }

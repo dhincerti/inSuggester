@@ -1,25 +1,27 @@
-package com.incerti.inSuggester.weather;
+package com.incerti.inSuggester.infrastructure.external.owm;
 
+import com.incerti.inSuggester.domain.model.weather.WeatherProvider;
+import com.incerti.inSuggester.infrastructure.exceptions.WeatherException;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Service
-public class OpenWeatherMapService implements WeatherService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(OpenWeatherMapService.class);
+public class OpenWeatherMapProvider implements WeatherProvider {
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenWeatherMapProvider.class);
 
-  @Value("${services.weather.apikey}")
-  private String apiKey;
+  @Autowired
+  private OpenWeatherMapProperties openWeatherMapProperties;
 
   @Override
   @Cacheable(cacheNames = "temperature", key = "#city")
-  public Double getCurrentTemperatureOf(final String city) {
+  public Double getCurrentTemperatureOf(final String city) throws WeatherException {
     LOGGER.info("Retrieving current temperature of '{}' city", city);
 
     try {
@@ -43,7 +45,7 @@ public class OpenWeatherMapService implements WeatherService {
    * This whole method will be stubbed.
    */
   public Double getOwnCurrentWeatherByCityName(final String city) throws APIException {
-    final OWM owm = new OWM(apiKey);
+    final OWM owm = new OWM(openWeatherMapProperties.getApiKey());
     owm.setUnit(OWM.Unit.METRIC);
     return Objects.requireNonNull(owm.currentWeatherByCityName(city).getMainData()).getTemp();
   }

@@ -1,4 +1,4 @@
-package com.incerti.inSuggester.music;
+package com.incerti.inSuggester.domain.model.music;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

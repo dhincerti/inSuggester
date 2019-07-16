@@ -1,15 +1,15 @@
-package com.incerti.inSuggester.weather;
+package com.incerti.inSuggester.infrastructure.external.owm;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
-import com.incerti.inSuggester.weather.OpenWeatherMapService;
-import com.incerti.inSuggester.weather.WeatherException;
+import com.incerti.inSuggester.infrastructure.exceptions.WeatherException;
 import net.aksingh.owmjapis.api.APIException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
@@ -17,7 +17,8 @@ public class OpenWeatherMapServiceTest {
   private static final String LONDON = "London";
 
   @Spy
-  private OpenWeatherMapService openWeatherMapService;
+  @InjectMocks
+  private OpenWeatherMapProvider openWeatherMapService;
 
   @Before
   public void initMocks() {
@@ -25,7 +26,7 @@ public class OpenWeatherMapServiceTest {
   }
 
   @Test
-  public void shouldReturnRightTemperature() throws APIException {
+  public void shouldReturnRightTemperature() throws APIException, WeatherException {
     final Double expectedTemperature = 1.0;
     doReturn(expectedTemperature).when(openWeatherMapService)
         .getOwnCurrentWeatherByCityName(LONDON);
@@ -33,7 +34,7 @@ public class OpenWeatherMapServiceTest {
   }
 
   @Test(expected = WeatherException.class)
-  public void shouldThrowBusinessException() throws APIException {
+  public void shouldThrowBusinessException() throws APIException, WeatherException {
     doThrow(APIException.class).when(openWeatherMapService).getOwnCurrentWeatherByCityName(LONDON);
     openWeatherMapService.getCurrentTemperatureOf(LONDON);
   }

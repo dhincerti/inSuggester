@@ -8,12 +8,20 @@ import java.util.Map;
 
 @Component
 @ConfigurationProperties(prefix = "cache")
-public class CacheConfigurationProperties {
-
+public class CacheProperties {
+  private boolean enabled;
   private long timeout;
   private String redisHost;
   private int redisPort;
   private Map<String, Long> expiration = new HashMap<>();
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
+  }
 
   public long getTimeout() {
     return timeout;
