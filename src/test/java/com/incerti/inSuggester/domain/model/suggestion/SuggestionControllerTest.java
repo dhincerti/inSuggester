@@ -1,25 +1,22 @@
-package com.incerti.inSuggester.suggestion;
+package com.incerti.inSuggester.domain.model.suggestion;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.incerti.inSuggester.music.Genre;
-import com.incerti.inSuggester.music.Playlist;
-import com.incerti.inSuggester.music.Song;
-import com.incerti.inSuggester.suggestion.SuggestionController;
-import com.incerti.inSuggester.suggestion.SuggestionService;
+import com.incerti.inSuggester.domain.model.music.Genre;
+import com.incerti.inSuggester.domain.model.music.Playlist;
+import com.incerti.inSuggester.domain.model.music.Song;
+import com.incerti.inSuggester.infrastructure.exceptions.MusicException;
+import com.incerti.inSuggester.infrastructure.exceptions.WeatherException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 public class SuggestionControllerTest {
   private static final String LONDON = "London";
@@ -36,16 +33,15 @@ public class SuggestionControllerTest {
   }
 
   @Test
-  public void apiShouldRespondWithSuccess() {
+  public void apiShouldRespondWithSuccess() throws MusicException, WeatherException {
     final Song expectedSong = Song.getDummySong();
     final Playlist expectedPlaylist = new Playlist(Genre.ROCK, expectedSong);
 
     when(suggestionService.getPlaylistSuggestion(LONDON)).thenReturn(expectedPlaylist);
-    final ResponseEntity<Playlist> actualPlaylist = suggestionController.getMusicSuggestion(LONDON);
+    final Playlist actualPlaylist = suggestionController.getMusicSuggestion(LONDON);
 
-    assertThat(actualPlaylist.getStatusCode(), is(HttpStatus.OK));
-    assertThat(actualPlaylist.getBody().getGenre(), equalTo(Genre.ROCK));
-    assertThat(actualPlaylist.getBody().getSongs(), hasSize(1));
-    assertThat(actualPlaylist.getBody().getSongs(), hasItem(samePropertyValuesAs(expectedSong)));
+    assertThat(actualPlaylist.getGenre(), equalTo(Genre.ROCK));
+    assertThat(actualPlaylist.getSongs(), hasSize(1));
+    assertThat(actualPlaylist.getSongs(), hasItem(samePropertyValuesAs(expectedSong)));
   }
 }

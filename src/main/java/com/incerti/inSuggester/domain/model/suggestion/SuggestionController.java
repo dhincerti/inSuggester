@@ -1,10 +1,10 @@
-package com.incerti.inSuggester.suggestion;
+package com.incerti.inSuggester.domain.model.suggestion;
 
-import com.incerti.inSuggester.music.Playlist;
+import com.incerti.inSuggester.domain.model.music.Playlist;
+import com.incerti.inSuggester.infrastructure.exceptions.MusicException;
+import com.incerti.inSuggester.infrastructure.exceptions.WeatherException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +22,8 @@ public class SuggestionController {
   }
 
   @GetMapping(path = "/music", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Playlist> getMusicSuggestion(@RequestParam("city") final String city) {
-    return new ResponseEntity<>(suggestionService.getPlaylistSuggestion(city), HttpStatus.OK);
+  public Playlist getMusicSuggestion(@RequestParam("city") final String city)
+      throws MusicException, WeatherException {
+    return suggestionService.getPlaylistSuggestion(city);
   }
 }

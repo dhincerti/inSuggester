@@ -1,19 +1,21 @@
-package com.incerti.inSuggester.suggestion;
+package com.incerti.inSuggester.domain.model.suggestion;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import com.incerti.inSuggester.music.Genre;
-import com.incerti.inSuggester.music.MusicService;
-import com.incerti.inSuggester.music.Playlist;
-import com.incerti.inSuggester.music.Song;
-import com.incerti.inSuggester.suggestion.SuggestionService;
-import com.incerti.inSuggester.weather.WeatherService;
+import com.incerti.inSuggester.domain.model.music.Genre;
+import com.incerti.inSuggester.domain.model.music.MusicProvider;
+import com.incerti.inSuggester.domain.model.music.Playlist;
+import com.incerti.inSuggester.domain.model.music.Song;
+import com.incerti.inSuggester.domain.model.weather.WeatherProvider;
+import com.incerti.inSuggester.infrastructure.exceptions.MusicException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -26,10 +28,10 @@ public class SuggestionServiceTest {
   private SuggestionService suggestionService;
 
   @Mock
-  private WeatherService weatherService;
+  private WeatherProvider weatherProvider;
 
   @Mock
-  private MusicService musicService;
+  private MusicProvider musicProvider;
 
   @Before
   public void initMocks() {
@@ -37,12 +39,12 @@ public class SuggestionServiceTest {
   }
 
   @Test
-  public void shouldSuggestPopMusic() {
+  public void shouldSuggestPopMusic() throws Exception {
     final Song song = Song.getDummySong();
     final Playlist expectedPlaylist = new Playlist(Genre.POP, song);
 
-    when(weatherService.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(30));
-    when(musicService.getPlaylistByGenre(Genre.POP)).thenReturn(expectedPlaylist);
+    when(weatherProvider.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(30));
+    when(musicProvider.getPlaylistByGenre(Genre.POP)).thenReturn(expectedPlaylist);
 
     final Playlist actualPlaylist = suggestionService.getPlaylistSuggestion(anyString());
 
@@ -52,12 +54,12 @@ public class SuggestionServiceTest {
   }
 
   @Test
-  public void shouldSuggestRockMusic() {
+  public void shouldSuggestRockMusic() throws Exception {
     final Song expectedSong = Song.getDummySong();
     final Playlist expectedPlaylist = new Playlist(Genre.ROCK, expectedSong);
 
-    when(weatherService.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(15));
-    when(musicService.getPlaylistByGenre(Genre.ROCK)).thenReturn(expectedPlaylist);
+    when(weatherProvider.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(15));
+    when(musicProvider.getPlaylistByGenre(Genre.ROCK)).thenReturn(expectedPlaylist);
 
     final Playlist actualPlaylist = suggestionService.getPlaylistSuggestion(anyString());
 
@@ -67,17 +69,23 @@ public class SuggestionServiceTest {
   }
 
   @Test
-  public void shouldSuggestClassicalMusic() {
+  public void shouldSuggestClassicalMusic() throws Exception {
     final Song expectedSong = Song.getDummySong();
     final Playlist expectedPlaylist = new Playlist(Genre.CLASSICAL, expectedSong);
 
-    when(weatherService.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(0));
-    when(musicService.getPlaylistByGenre(Genre.CLASSICAL)).thenReturn(expectedPlaylist);
+    when(weatherProvider.getCurrentTemperatureOf(anyString())).thenReturn(Double.valueOf(0));
+    when(musicProvider.getPlaylistByGenre(Genre.CLASSICAL)).thenReturn(expectedPlaylist);
 
     final Playlist actualPlaylist = suggestionService.getPlaylistSuggestion(anyString());
 
     assertThat(actualPlaylist.getGenre(), equalTo(Genre.CLASSICAL));
     assertThat(actualPlaylist.getSongs(), hasSize(1));
     assertThat(actualPlaylist.getSongs(), hasItem(samePropertyValuesAs(expectedSong)));
+  }
+
+  @Test(expected = MusicException.class)
+  public void shouldThrowBusinessException() throws Exception {
+    doThrow(MusicException.class).when(musicProvider).getPlaylistByGenre(any(Genre.class));
+    suggestionService.getPlaylistSuggestion(Genre.ROCK.toString());
   }
 }
