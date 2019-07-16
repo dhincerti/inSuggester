@@ -1,16 +1,16 @@
 # inSuggester - The best search time reducer!
 
-By now, this project provide an API for getting suggestions over musics based on weather conditions. 
-Further it will be improved with other streaming suggestion types. Ex: films, series, lives, etc...
+By now, this project provides an API for getting suggestions over musics based on weather conditions. 
+It will be further improved with other streaming suggestion types. Ex: films, series, etc...
 
 # Architecture 
 
 ## Language and framework
-Java was chosen as main language for several reasons, but, the main ones are:
- * My personal knowledge
+Java was chosen as the main language mainly because of:
+ * My personal knowledge;
  * The framework Spring Boot
-    * It makes easy to create stand-alone (no server configurations needed) applications 
-    what lets us to rapidly start coding what really brings value: business rules. 
+    * It makes easier to create stand-alone (no server configurations needed) applications 
+    what lets us to rapidly start coding which really brings value: business rules. 
     * Easy to scale. Spring will internally manage threads to adapt to changes in volume. 
     Threads and database connections can be pooled to minimize overhead. 
 
@@ -21,8 +21,8 @@ See more:
 ## External services
 
 #### Weather provider
-After that [Yahoo messed up its own weather service](https://www.igorkromin.net/index.php/2016/03/27/yahoo-effectively-shut-down-its-weather-api-by-forcing-oauth-10-and-crippling-it/),
-Open Weather Map has being one of the best weather services. It has [a well documented](https://openweathermap.org/api) 
+After [Yahoo messed up its own weather service](https://www.igorkromin.net/index.php/2016/03/27/yahoo-effectively-shut-down-its-weather-api-by-forcing-oauth-10-and-crippling-it/),
+Open Weather Map has become one of the best weather services. It has [a well documented](https://openweathermap.org/api) 
 API that provides free weather data for thousands of cities across the globe 
 and it also has [an easy to use Java library](https://bitbucket.org/aksinghnet/owm-japis/src/master/).
 
@@ -33,13 +33,30 @@ it offers free access to public playlists, requiring only an Access Token. It me
 there is no need for users to login, and yet they will be able to listen a song preview.
 It also has [an easy to use Java library](https://github.com/thelinmichael/spotify-web-api-java).
 
+## Distributed cache with Redis
+In order to optimize the response time and decrease the number of external services calls, 
+this application relies on a cache mechanism. It uses Redis, a popular open-source, 
+in-memory data structure store, that can be used as a distributed cache solution that could 
+be accessed from all cloud services.
+
+It uses different time-to-live (TTL) values as follow:
+* 24h for playlist generations by genre.
+* 10min for current temperature by city.
 
 # How to run it
 What you’ll need
+- [Docker](https://docs.docker.com/docker-for-windows/install/)
 - [JDK 1.8](https://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [Maven 3.2+](https://maven.apache.org/download.cgi)
 
-After cloning, you can use the command line to navigate until the project folder and run:
+For the very first time, use following command to create a redis image:
+
+`docker run -it --name redis -p 6379:6379 redis:5.0.3`
+
+Obs: for future usages `docker start redis` should be enough.
+
+Once you have cloned or download this project, you can use the command line to navigate to 
+the project folder and run:
 
 `mvn spring-boot:run`
 
